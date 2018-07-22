@@ -1,0 +1,132 @@
+<div class="container">
+  <div class="wrapper">
+     <!-- Sidebar Holder -->
+
+     <nav id="sidebar" [ngClass]="{'active': sidebarState === true}">
+          <!-- User Info-->
+          <div class="sidebar-header row" style="margin:0">
+            <div class="self-name">{{userInfo.firstName}} {{userInfo.lastName}}
+            </div>
+            <strong>{{userInfo.firstName|firstCharPipe}} {{userInfo.lastName| firstCharPipe}}</strong>
+             <img class="profile-pic" src="./../../../assets/default/defualt-user.png" alt="" (click)="onProfileView()">
+         </div>
+         <!-- Rooms and Users-->
+         <span class="title">Active Rooms</span><br>
+          <span class="room-buttons" *ngIf="!sidebarState">
+            <button class="create-room btn btn-warning" style="margin:5px;padding:5px 15px;"(click)="onRoomCreatorView('create')">Create</button>
+            <button class="delete-room btn btn-danger" style="margin:5px;padding:5px 15px;"(click)="onRoomCreatorView('delete')">Delete</button>
+          </span>
+          <ng-scrollbar>
+         <ul class="people">
+            <li class="person col-12" [ngClass]="{'unread':room.unread!=0,'activeChat': room.chatting == true}" (click)="roomSelectedToChat(room.roomId, room.name)"
+            *ngFor="let room of roomsList" >
+               <div class="col-3" style="align-self:center">
+                 <img src="./../../../assets/default/default-person.png" alt="" />
+               </div>
+               <div class="col-9 info" style="padding-left:0;display:flex;flex-flow:column;justify-content:space-evenly">
+                 <div style="display:flex; margin: 0 1vw 0 1vw;justify-content:space-between">
+                     <span class="name">{{room.name}}</span>
+                     <span class="time">2:09 PM</span>
+                 </div>
+                 <div style="display:flex; margin: 0 1vw 0 1vw;justify-content:flex-start">
+                    <span class="preview"><span *ngIf="typingUserName!=''" >{{typingUserName}} is typing</span></span>
+                 </div>
+               </div>                  
+            </li>               
+          </ul>
+          <span class="title">Online Users</span>
+         <ul class="people">
+                 <li class="person col-12" [ngClass]="{'unread':user.unread!=0,'activeChat': user.chatting == true}" (click)="userSelectedToChat(user.userId, user.name)"
+                 *ngFor="let user of userList" >
+                    <div class="col-3" style="align-self: center">
+                      <img src="./../../../assets/default/default-person.png" alt="" />
+                    </div>
+                    <div class="col-9 info"style="padding-left:0;display:flex;flex-flow:column;justify-content:space-evenly">
+                      <div class="info"style="display:flex; margin: 0 1vw 0 1vw;justify-content:space-between">
+                          <span class="name" >{{user.name}}</span>
+                          <span class="time" >2:09 PM</span>
+                      </div>
+                      <div class="info "style="display:flex; margin: 0 1vw 0 1vw;justify-content:flex-start">
+                      <span class="preview">Hey, I was wandering to use this!</span>
+                    </div>
+                    </div>                  
+                 </li>               
+         </ul>
+        </ng-scrollbar>
+     </nav>
+
+     <!-- Page Chat Content Holder -->
+     <div id="content" [ngClass]="{'active':contentState==true}">
+        <nav class="navbar navbar-default" [ngClass]="{'active':navbarState==true}">
+             <div class="container-fluid" style="display:inline-flex;">
+                    <span style="justify-content: flex-start">
+                      <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn"  (click)="backToList()">
+                         =
+                      </button>&nbsp;
+                      <span (click)="onRoomCreatorView('update')" class="name"><i class="fa fa-circle online"></i>&nbsp;
+                        {{receiverName}}&nbsp;
+                        <span *ngIf="typingUserName!=''" style="font-size: 11px">{{typingUserName}} is typing</span>
+                      </span>
+                    </span>
+                    <span *ngIf="roomLeave" style="justify-self: flex-end">
+                      <button class="btn btn-primary"  (click)="onAction('invite')">Invite</button>&nbsp;
+                      <button class="btn btn-danger"  (click)="onLeaveRoom()">Leave</button>&nbsp;
+                      <button class="btn btn-warning" (click)="onAction('kick')">Kick</button>
+                    </span>
+             </div>
+        </nav>
+
+        <div id="chat" #scrollMe [scrollTop]="(scrollToChatTop)?0:scrollMe.scrollHeight" [ngClass]="{'active': chatboxState===true} " class="chat-history" *ngIf="chatboxState">             
+          <ul>
+            <li *ngIf="roomJoined==false"><button class="btn btn-warning" style="margin:5px;padding:5px 15px;"(click)="onJoinRoom()">Join</button> </li>          
+            
+            <li style="text-align:center" *ngIf="previousChat">  
+              <span class="conversation-start cursorPointer" (click)="loadEarlierPageOfChat()">Load Previous Chat</span> 
+              <br>
+              <span class="conversation-start" *ngIf="loadingPreviousChat == true">Loading...</span>
+            </li><br>
+            <li class="clearfix" *ngFor="let message of messageList">
+                  <div class="message bubble" [ngClass]="{'me': message.senderId == userInfo.userId, 'you': message.senderId != userInfo.userId}">
+                    {{message?.message | removeSpecialCharPipe: '#' | removeSpecialCharPipe: '$'}}  
+                  </div>  
+                  <div class="message-data"[ngClass]="{'you': message.senderId == userInfo.userId}">
+                    {{message?.createdOn | date: 'medium' }}
+                  </div>
+            </li>
+          </ul> 
+        </div>
+
+        <div id="kickForm" style="margin:10% 0" class="col-md-12" *ngIf="removeUserState">
+            <span *ngIf="action!='delete'">Members: </span>
+            <label *ngIf="action!='delete'" for="inputMembers" class="sr-only">Select Members </label> 
+            <mat-form-field *ngIf="action!='delete'">
+                <mat-select placeholder="Members" class="form-control" [(ngModel)]="chosenMemberList" multiple required>
+                  <mat-option *ngFor="let x of membersList" [value]="x.name">{{x.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <button class="btn btn-lg btn-primary btn-block" type="button"  (click)="FromRoom(action)">{{action}}</button>
+        </div>
+        <div class="write" *ngIf="previousChat" [ngClass]="{'active':writeboxState===true}">
+            <a href="javascript:;" class="write-link attach"></a>
+            <input name="message-to-send" id="message-to-send" (keydown)="sendMessageUsingKeypress($event)"(keypress)="typing()" [(ngModel)]="messageText"
+            placeholder="Type your message" type="text"/>
+            <a href="javascript:;" class=" write-link smiley"></a>
+            <a (click)=sendMessage() class="write-link send"></a>
+        </div> 
+    </div>
+    <div *ngIf="checkContent()" style="text-align: center;margin-top: 45vh; font-weight: 600"class="col-sm blankContent">
+          Click on user or Room to start a chat!!!
+    </div>
+    
+    <!-- Profile-Pic Editor -->
+      <div id="profile-editor"[ngClass]="{'active':profileeditorState===true}">
+          <img class="pic"src="./../../../assets/default/defualt-user.png" alt="">
+          <span class="status"> Cool!! </span>
+          <button type="button" div="pro-update" class="btn profile-update" (click)="onProfileView()">Update</button>
+      </div>
+     <!--Room Create-->
+      <div id="room-creator" [ngClass]="{'active':roomcreatorState==true}">
+        <app-room-creator [creatorId]="userInfo.userId" [creatorName]="userInfo.firstName+' '+userInfo.lastName"[action]="roomAction" [usersList]="userList" [roomModel]="roomModel" [roomList]="roomsList" (changeView)="back($event)" (warning)="showWarning($event)"></app-room-creator>
+      </div>
+  </div>
+</div>

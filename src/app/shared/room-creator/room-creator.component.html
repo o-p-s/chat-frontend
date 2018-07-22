@@ -1,0 +1,50 @@
+<div id="editor">
+    <nav class="navbar navbar-default" [ngClass]="{'active':navbarState==true}">
+        <div class="container-fluid" style="display:inline-flex;">
+               <span style="justify-content: flex-start">
+                 <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn"  (click)="backToView()">
+                    =
+                 </button>&nbsp;
+                 </span>
+        </div>
+   </nav>
+    <div class="getinfo" style="margin:10% 0"> 
+        <span *ngIf="action!='delete'" >RoomName: </span>
+        <label *ngIf="action!='delete'" for="inputRoomName" class="sr-only">Room Name</label>    
+        <input *ngIf="action!='delete'" type="text" id="inputRoomName" class="form-control" [(ngModel)]="roomName" placeholder="Name" required autofocus>
+        <br>
+
+        <span *ngIf="action==='delete'">Select Rooms</span>
+        <span *ngIf="action=='delete'" style="font-size: 10px">(Select rooms to delete)</span>
+        <label *ngIf="action==='delete'" for="inputMembers" class="sr-only">Select Rooms </label> 
+        <mat-form-field *ngIf="action==='delete'">
+            <mat-select placeholder="Rooms" class="form-control" [(ngModel)]="rooms" multiple required>
+              <mat-option *ngFor="let x of roomList" [value]="x.name">{{x.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <span *ngIf="action=='update'">State: </span>
+          <span *ngIf="action=='update'" style="font-size: 10px">(Set state of the group)</span>
+        <label *ngIf="action=='update'" class="sr-only">Select Sate </label> 
+        <mat-form-field  style="width:50%" *ngIf="action=='update'">
+            <mat-select  placeholder="State" [(value)]="stateUpdate">
+              <mat-option value="active">Active</mat-option>
+              <mat-option value="inactive">Inactive</mat-option>
+            </mat-select>
+          </mat-form-field> 
+
+        <span *ngIf="action=='create'">Members: </span>
+          <span *ngIf="action=='create'" style="font-size: 10px">(Select members to add in this group)</span>
+        <label *ngIf="action=='create'" for="inputMembers" class="sr-only">Select Members </label> 
+        <mat-form-field *ngIf="action=='create'" >
+            <mat-select placeholder="Users"  class="form-control" [(ngModel)]="members" multiple>
+              <mat-option  *ngFor="let x of usersList" [value]="x.name">{{x.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>   
+        <br>
+
+        <button class="btn btn-lg btn-primary btn-block" type="button"  (click)="roomCreatorFunction()">{{action|uppercase}}</button>
+    </div>   
+  <div class="col-md-12"></div>
+    
+</div>

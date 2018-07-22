@@ -1,0 +1,34 @@
+#editor {
+    display: block;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+}
+#editor .navbar {
+    display: flex;
+    padding: 0 2vw;
+    height: 9vh;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 1vh;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+#editor .navbar.active{
+    display:flex;
+}
+#editor .navbar-btn.active {
+    margin:0 1vw; 
+    box-shadow: none;
+    outline: none !important;
+    border: none;
+}
+#editor .getinfo{
+    display: flex;
+    overflow: hidden;
+    padding: 5vh 10px 5vh 10px;
+    border-width: 1px 1px 1px 0;
+    border-style: solid;
+    border-color: #e6e6e6;
+    flex-direction: column;
+}
